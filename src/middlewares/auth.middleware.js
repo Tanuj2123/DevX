@@ -12,7 +12,7 @@ const autenticateUser = (req,res,next)=>{
 
     try {
         const decodedObj = jwt.verify(token,process.env.JWT_SECRET);
-        req.user = decodedObj.userId;
+        req.userId = decodedObj.userId;
         next();
     } catch (error) {
         res.status(401).json({
