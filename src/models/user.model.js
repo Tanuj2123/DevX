@@ -50,13 +50,12 @@ userSchema.methods.validatePassword = async function(password){
     return isValidPassword;
 }
 
-userSchema.pre("save",async function(next){
+userSchema.pre("save",async function(){
     const user = this;
 
     const hashedPassword = await bcrypt.hash(user.password,10);
 
     user.password = hashedPassword;
-    next();
 })
 
 const UserModel = mongoose.model("User",userSchema);
