@@ -2,6 +2,7 @@ const express = require("express");
 const CookieParser = require("cookie-parser");
 const authRouter = require("./routes/auth.routes");
 const profileRouter = require("./routes/profile.routes");
+const requestRouter = require("./routes/requests.routes");
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(CookieParser());
  */
 app.use("/auth",authRouter);
 app.use("/profile",profileRouter);
+app.use("/request",requestRouter);
 
 
 

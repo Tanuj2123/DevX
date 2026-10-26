@@ -27,7 +27,10 @@ const userSchema = new mongoose.Schema({
     },
     gender:{
         type:String,
-        enum:["male","female","others"],
+        enum:{
+            values:["male","female","others"],
+            message:`{VALUE} is not valid gender`
+        },
         required:true
     }
 },{timestamps:true});
@@ -46,6 +49,15 @@ userSchema.methods.validatePassword = async function(password){
     const isValidPassword = await bcrypt.compare(password,this.password);
     return isValidPassword;
 }
+
+userSchema.pre("save",async function(next){
+    const user = this;
+
+    const hashedPassword = await bcrypt.hash(user.password,10);
+
+    user.password = hashedPassword;
+    next();
+})
 
 const UserModel = mongoose.model("User",userSchema);
 

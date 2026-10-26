@@ -15,14 +15,11 @@ router.post("/signup", async (req,res)=>{
         const {name,email,password,age,gender} = req.body;
 
         validateSignUpData(name,email,password,age,gender);
-        
-
-        const hashedPassword = await bcrypt.hash(password,10);
-
         const user = {
             name,email,
-            password:hashedPassword,
-            age,gender
+            password,
+            age,
+            gender
         }
 
         const newUser = new UserModel(user);
