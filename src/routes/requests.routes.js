@@ -78,6 +78,53 @@ router.post("/send/:status/:toUserId",autenticateUser,async (req,res)=>{
     }
 });
 
+router.post("/review/:status/:requestId",autenticateUser,async (req,res)=>{
+    const userId = req.userId;
+    const {status,requestId} = req.params;
+
+    try {
+        const user = await UserModel.findOne({_id:userId});
+
+        if(!user){
+            return res.status(404).json({
+                message:"user not found"
+            });
+        }
+
+        const allowedStatus = ["accepted","rejected"]
+        if(!allowedStatus.includes(status)){
+            return res.status(400).json({
+                message:"Invalid status: "+status
+            });
+        }
+
+        const connectionRequest = await ConnectionModel.findOne({_id:requestId,
+            toUserId:userId,status:"interested"});
+
+        if(!connectionRequest){
+            return res.status(404).json({
+                message:"Request does not exist"
+            });
+        }
+
+        connectionRequest.status = status;
+
+        const fromUser = await UserModel.findOne({_id:connectionRequest.fromUserId});
+
+        const data = await connectionRequest.save();
+
+        res.status(200).json({
+            message:user.name+" "+status+" "+fromUser.name+"'s request" ,
+            data
+        }); 
+    } catch (error) {
+        res.status(500).json({
+            message:error.message
+        });
+    }
+
+})
+
 
 
 module.exports = router;

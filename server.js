@@ -7,6 +7,6 @@ connectDB().then(()=>{
     app.listen(6969,()=>{
     console.log("connected to server babu succesffuly on port 6969");
     })
-}).catch(()=>{
-    console.log("error occured");
+}).catch((error)=>{
+    console.log("ERROR: "+error.message);
 })
