@@ -52,7 +52,8 @@ router.get("/connections",autenticateUser,async (req,res)=>{
             if(connection.fromUserId._id.equals(userId)){
                 return connection.toUserId
             }
-            else return connection.fromUserId
+
+            return connection.fromUserId
         });
 
         return res.status(200).json({
@@ -61,6 +62,50 @@ router.get("/connections",autenticateUser,async (req,res)=>{
         });
     } catch (error) {
         return res.status(500).json({
+            message:error.message
+        });
+    }
+})
+
+router.get("/feed",autenticateUser,async (req,res)=>{
+    const userId = req.userId;
+
+    const page = Number(req.query?.page) || 1;
+    let limit = Number(req.query?.limit) || 10;
+    if(limit>30){
+        limit = 30;
+    }
+    try {
+        const user = await UserModel.findOne({_id:userId});
+
+        const usersWithConnection = await ConnectionModel.find({
+            $or:[
+                {fromUserId:userId},
+                {toUserId:userId}
+            ]
+        });
+
+        const objIds = usersWithConnection.map((user)=>{
+            if(user.fromUserId.equals(userId)){
+                return user.toUserId;
+            }
+
+            return user.fromUserId
+        });
+
+        objIds.push(userId);
+
+        const feed = await UserModel.find({
+            _id:{$nin:objIds}
+        }).skip(limit*(page-1)).limit(limit).select("name age gender");
+
+        return res.status(200).json({
+            success:true,
+            feed
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success:false,
             message:error.message
         });
     }
