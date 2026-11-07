@@ -116,7 +116,7 @@ router.patch("/updatePassword",autenticateUser,async (req,res)=>{
  * - DELETE /profile - delete userProfile
 */
 router.delete("/",autenticateUser,async (req,res)=>{
-    const user = await UserModel.deleteOne({_id:req.user});
+    const user = await UserModel.deleteOne({_id:req.userId});
 
     res.status(200).json({
         message:"user deleted successfully",
