@@ -12,15 +12,17 @@ const router = express.Router();
 */
 router.get("/", autenticateUser,async (req,res)=>{
     
-    const user = await UserModel.findOne({_id:req.userId});
+    const user = await UserModel.findOne({_id:req.userId}).select("name age gender photoUrl");
 
     if(!user){
         return res.status(404).json({
+            success:false,
             message:"user not found"
         });
     }
 
     res.status(200).json({
+        success:true,
         message:"user Found",
         user
     });

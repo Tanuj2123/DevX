@@ -1,7 +1,6 @@
 const express = require("express");
 const validateSignUpData = require("../validations/signup.validate");
 const UserModel = require("../models/user.model");
-const bcrypt = require("bcryptjs");
 const autenticateUser = require("../middlewares/auth.middleware");
 
 const router = express.Router();
@@ -12,21 +11,31 @@ const router = express.Router();
 */
 router.post("/signup", async (req,res)=>{
     try {
-        const {name,email,password,age,gender} = req.body;
+        const {name,email,password,age,gender,photoUrl} = req.body;
 
         validateSignUpData(name,email,password,age,gender);
         const user = {
             name,email,
             password,
             age,
-            gender
+            gender,
+            photoUrl
         }
 
         const newUser = new UserModel(user);
 
         await newUser.save();
 
+        const token = newUser.getJWT();
+
+        res.cookie("token",token,{
+            httpOnly:true,
+            secure:true,
+            sameSite:"lax"
+        });
+
         res.status(201).json({
+            success:true,
             message:"user created successfully",
             newUser
         });
@@ -64,9 +73,25 @@ router.post("/login",async (req,res)=>{
 
         const token = user.getJWT();
 
-        res.cookie("token",token);
+        res.cookie("token",token,{
+            httpOnly:true,
+            secure:true,
+            sameSite:"lax"
+        });
+
+        
+
+        const data = {
+            age:user.age,
+            email:user.email,
+            gender:user.gender,
+            name:user.name,
+            photoUrl:user?.photoUrl
+        }
 
         return res.status(200).json({
+            success:true,
+            user:data,
             message:"user loggedin Sucessfully"
         })
         

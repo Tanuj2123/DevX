@@ -32,6 +32,9 @@ const userSchema = new mongoose.Schema({
             message:`{VALUE} is not valid gender`
         },
         required:true
+    },
+    photoUrl:{
+        type:String
     }
 },{timestamps:true});
 

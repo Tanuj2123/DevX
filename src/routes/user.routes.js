@@ -12,7 +12,7 @@ router.get("/requests/pending",autenticateUser,async (req,res)=>{
         const user = await UserModel.findOne({_id:req?.userId});
 
 
-        const pendingConnections = await ConnectionModel.find({toUserId:user._id,status:"interested"}).populate("fromUserId",["name","age","gender"]);
+        const pendingConnections = await ConnectionModel.find({toUserId:user._id,status:"interested"}).populate("fromUserId",["name","age","gender","photoUrl"]);
         
 
 
@@ -39,7 +39,7 @@ router.get("/connections",autenticateUser,async (req,res)=>{
                 {fromUserId:userId,status:"accepted"},
                 {toUserId:userId,status:"accepted"}
             ]
-        }).populate("fromUserId",["name","age","gender"]).populate("toUserId",["name","age","gender"]);
+        }).populate("fromUserId",["_id", "name","age","gender","photoUrl"]).populate("toUserId",["_id","name","age","gender","photoUrl"]);
 
         //const data = connections.map((connection)=> connection.fromUserId);
         /**
@@ -71,7 +71,7 @@ router.get("/feed",autenticateUser,async (req,res)=>{
     const userId = req.userId;
 
     const page = Number(req.query?.page) || 1;
-    let limit = Number(req.query?.limit) || 10;
+    let limit = Number(req.query?.limit) || 30;
     if(limit>30){
         limit = 30;
     }
@@ -97,7 +97,7 @@ router.get("/feed",autenticateUser,async (req,res)=>{
 
         const feed = await UserModel.find({
             _id:{$nin:objIds}
-        }).skip(limit*(page-1)).limit(limit).select("name age gender");
+        }).skip(limit*(page-1)).limit(limit).select("name age gender photoUrl");
 
         return res.status(200).json({
             success:true,

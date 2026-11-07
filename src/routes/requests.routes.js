@@ -21,7 +21,7 @@ router.post("/send/:status/:toUserId",autenticateUser,async (req,res)=>{
 
         const allowedStatus = ["interested","ignored"];
 
-        if(!allowedStatus.includes(status)){
+        if(!allowedStatus.includes(status.toLowerCase().trim())){
             return res.status(400).json({
                 message:"Invalid Status type:"+status
             });

@@ -6,6 +6,7 @@ const autenticateUser = (req,res,next)=>{
 
     if(!token){
         return res.status(401).json({
+            success:false,
             message:"Unauthorized"
         });
     }
@@ -16,6 +17,7 @@ const autenticateUser = (req,res,next)=>{
         next();
     } catch (error) {
         res.status(401).json({
+            success:false,
             message:error.message
         })
     }

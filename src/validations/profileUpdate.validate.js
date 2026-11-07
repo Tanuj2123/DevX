@@ -1,11 +1,11 @@
 
 
 const validateProfileUpdateData = async (req)=>{
-    const allowedUpdates = ["name","age","gender"];
+    const allowedUpdates = ["name","age","gender","photoUrl"];
 
     const payload = req.body;
 
-   const isValidUpdate =  Object.keys(payload).every((key)=> allowedUpdates.includes(key));
+   const isValidUpdate =  Object.keys(payload).every((key)=> allowedUpdates.includes(key.toLowerCase().trim()));
 
    return isValidUpdate;
 }
