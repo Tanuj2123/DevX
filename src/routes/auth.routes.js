@@ -30,7 +30,7 @@ router.post("/signup", async (req,res)=>{
 
         res.cookie("token",token,{
             httpOnly:true,
-            secure:true,
+            secure:false,// only because i dont have domain main and didnt enable https connection
             sameSite:"lax"
         });
 
@@ -75,7 +75,7 @@ router.post("/login",async (req,res)=>{
 
         res.cookie("token",token,{
             httpOnly:true,
-            secure:true,
+            secure:false,
             sameSite:"lax"
         });
 
