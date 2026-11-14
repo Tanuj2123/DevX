@@ -2,6 +2,7 @@ const express = require("express");
 const validateSignUpData = require("../validations/signup.validate");
 const UserModel = require("../models/user.model");
 const autenticateUser = require("../middlewares/auth.middleware");
+const sendEmail = require("../services/emailService");
 
 const router = express.Router();
 
@@ -25,6 +26,8 @@ router.post("/signup", async (req,res)=>{
         const newUser = new UserModel(user);
 
         await newUser.save();
+
+        await sendEmail(email,"Welcome to DevX","You Are now a part of the the devX family","<h1>Welcome to DevX</h1>");
 
         const token = newUser.getJWT();
 
