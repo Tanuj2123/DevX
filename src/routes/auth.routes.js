@@ -27,7 +27,7 @@ router.post("/signup", async (req,res)=>{
 
         await newUser.save();
 
-        await sendEmail(email,"Welcome to DevX","You Are now a part of the the devX family","<h1>Welcome to DevX</h1>");
+        await sendEmail(email,"Welcome to DevX","You Are now a part of the the devX family","<h2>Connect to the World With DevX</h2>");
 
         const token = newUser.getJWT();
 

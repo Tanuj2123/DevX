@@ -6,6 +6,7 @@ const requestRouter = require("./routes/requests.routes");
 const userRouter = require("./routes/user.routes");
 const cors = require("cors")
 const app = express();
+require("./jobs/sendRequestRemianders");
 
 
 /**
