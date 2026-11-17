@@ -35,6 +35,13 @@ const userSchema = new mongoose.Schema({
     },
     photoUrl:{
         type:String
+    },
+    isPremium:{
+        type:Boolean,
+        default:false
+    },
+    membershipType:{
+        type:String
     }
 },{timestamps:true});
 
@@ -56,9 +63,15 @@ userSchema.methods.validatePassword = async function(password){
 userSchema.pre("save",async function(){
     const user = this;
 
-    const hashedPassword = await bcrypt.hash(user.password,10);
+    try {
+        if(this.isModified("password")){
+            const hashedPassword = await bcrypt.hash(user.password,10);
 
-    user.password = hashedPassword;
+            user.password = hashedPassword;
+        }
+    } catch (error) {
+        
+    }
 })
 
 const UserModel = mongoose.model("User",userSchema);
