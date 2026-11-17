@@ -102,6 +102,21 @@ router.post("/webhook", async (req,res)=>{
     }
 })
 
+router.get("/verify",autenticateUser,async (req,res)=>{
+    try {
+        const user = await UserModel.findOne({_id:req.userId});
+
+
+        return res.status(200).json({
+            isPremium:user.isPremium
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message:error.message
+        })
+    }
+})
+
 
 
 

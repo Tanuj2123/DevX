@@ -12,7 +12,7 @@ const router = express.Router();
 */
 router.get("/", autenticateUser,async (req,res)=>{
     
-    const user = await UserModel.findOne({_id:req.userId}).select("name age gender photoUrl");
+    const user = await UserModel.findOne({_id:req.userId}).select("name age gender photoUrl isPremium");
 
     if(!user){
         return res.status(404).json({
