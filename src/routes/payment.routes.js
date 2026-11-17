@@ -64,7 +64,7 @@ router.post("/createOrder",autenticateUser,async(req,res)=>{
 router.post("/webhook", async (req,res)=>{
     try {
 
-        const webhookSignature = req.headers["X-Razorpay-Signature"];
+        const webhookSignature = req.get("X-Razorpay-Signature");
        const isValidWebhook =  validateWebhookSignature(JSON.stringify(req.body), webhookSignature, process.env.RAZORPAY_WEBHOOK_SECRET)
 
         if(!isValidWebhook){
