@@ -20,7 +20,8 @@ router.post("/signup", async (req,res)=>{
             password,
             age,
             gender,
-            photoUrl
+            photoUrl,
+            isPremium:false
         }
 
         const newUser = new UserModel(user);
@@ -89,7 +90,8 @@ router.post("/login",async (req,res)=>{
             email:user.email,
             gender:user.gender,
             name:user.name,
-            photoUrl:user?.photoUrl
+            photoUrl:user?.photoUrl,
+            isPremium:user?.isPremium
         }
 
         return res.status(200).json({
