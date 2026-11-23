@@ -28,6 +28,23 @@ router.get("/", autenticateUser,async (req,res)=>{
     });
 })
 
+router.get("/getData/:id",autenticateUser,async(req,res)=>{
+    const {id} = req.params;
+
+    try {
+        const user = await UserModel.findOne({_id:id}).select("name photoUrl");
+
+        return res.status(200).json({
+            success:true,
+            user
+        })
+    } catch (error) {
+        res.status(500).json({
+            message:error.message
+        })
+    }
+})
+
 /**
  * - PATCH /profile - update userProfile
 */
