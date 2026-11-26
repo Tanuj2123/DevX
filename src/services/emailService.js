@@ -29,7 +29,7 @@ const sendEmail = async(to,subject,text,html)=>{
         html: html, // HTML body
     });
     } catch (err) {
-        console.error("Error while sending mail:", err);
+        throw new Error("Error while sending mail:", err);
     }
 }
 

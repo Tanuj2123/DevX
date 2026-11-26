@@ -59,7 +59,7 @@ const initializeSocket = (server)=>{
 
                 io.to(roomId).emit("messageRecieved",{senderName,id:userId,message});
             } catch (error) {
-                res.status(500).json({
+                io.to(roomId).emit("error",{
                     message:error.message
                 })
             }

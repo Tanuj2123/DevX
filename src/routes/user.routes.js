@@ -49,7 +49,7 @@ router.get("/connections",autenticateUser,async (req,res)=>{
 
 
         const data = connections.map((connection)=> {
-            if(connection.fromUserId._id.equals(userId)){
+            if(connection?.fromUserId?._id.equals(userId)){
                 return connection.toUserId
             }
 

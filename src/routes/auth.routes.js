@@ -3,6 +3,10 @@ const validateSignUpData = require("../validations/signup.validate");
 const UserModel = require("../models/user.model");
 const autenticateUser = require("../middlewares/auth.middleware");
 const sendEmail = require("../services/emailService");
+const redisClient = require("../cache/redis");
+const generateOtp = require("../utils/generateOtp");
+const validateOTPData = require("../validations/validateOTPData");
+const bcrypt = require("bcryptjs")
 
 const router = express.Router();
 
@@ -15,20 +19,91 @@ router.post("/signup", async (req,res)=>{
         const {name,email,password,age,gender,photoUrl} = req.body;
 
         validateSignUpData(name,email,password,age,gender);
+
+        const isAlreadyExist = await UserModel.findOne({email:email});
+
+        if(isAlreadyExist){
+            return res.status(400).json({
+                success:false,
+                message:"User Already Exist! Please Login"
+            });
+        } 
+        const hashedPassword = await bcrypt.hash(password,10);
+        const otp = generateOtp();
         const user = {
             name,email,
-            password,
+            password:hashedPassword,
             age,
             gender,
             photoUrl,
-            isPremium:false
+            isPremium:false,
+            otp
         }
 
-        const newUser = new UserModel(user);
+
+        await redisClient.set(email,JSON.stringify(user),{EX:120});
+
+        await sendEmail(email,"DevX:Verify Your email","You Are going to be a part of the the devX family",`<h1>${otp}</h1>`);
+
+        
+
+        res.status(200).json({
+            success:true,
+            message:"User validation Successfull",
+        });
+    } catch (error) {
+        res.status(400).json({
+            message:error.message
+        })
+    }
+})
+
+
+router.post("/verifyEmail", async (req,res)=>{
+
+    try {
+        const {email,otp} = req.body;
+
+        if(!validateOTPData(email,otp)){
+            return res.status(400).json({
+                success:false,
+                message:"Enter Valid Data"
+            });
+        }
+
+        const user = await redisClient.get(email);
+        const data = JSON.parse(user);
+
+        if(!data){
+            return res.status(400).json({
+                success:false,
+                message:"Otp Expired"
+            });
+        }
+        
+        if(email !== data.email){
+            return res.status(400).json({
+                success:false,
+                message:"Invalid request"
+            });
+        }
+
+        if(data?.otp !== Number(otp)){
+            return res.status(400).json({
+                success:false,
+                message:"Incorrect OTP"
+            });
+        }
+
+        const {name,password,age,gender,photoUrl,isPremium} = data;
+
+        const newUser = new UserModel({
+            name,
+            email,
+            password,age,gender,photoUrl,isPremium
+        });
 
         await newUser.save();
-
-        await sendEmail(email,"Welcome to DevX","You Are now a part of the the devX family","<h2>Connect to the World With DevX</h2>");
 
         const token = newUser.getJWT();
 
@@ -36,19 +111,26 @@ router.post("/signup", async (req,res)=>{
             httpOnly:true,
             secure:true,
             sameSite:"lax"
-        });
+        })
+        await sendEmail(email,"Welcome to DevX","You Are now a part of the the devX family","<h2>Connect to the World With DevX</h2>");
 
-        res.status(201).json({
+        return res.status(200).json({
             success:true,
-            message:"user created successfully",
-            newUser
+            message:"User created Successfully",
+            userData:{
+                name,age,gender,photoUrl,isPremium
+            }
         });
     } catch (error) {
-        res.status(400).json({
-            "message":error.message
-        })
+        return res.status(500).json({
+            success:false,
+            message:error.message
+        });
     }
+
 })
+
+
 
 /**
  * - POST /auth/login - Login User

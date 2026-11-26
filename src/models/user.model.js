@@ -60,20 +60,6 @@ userSchema.methods.validatePassword = async function(password){
     return isValidPassword;
 }
 
-userSchema.pre("save",async function(){
-    const user = this;
-
-    try {
-        if(this.isModified("password")){
-            const hashedPassword = await bcrypt.hash(user.password,10);
-
-            user.password = hashedPassword;
-        }
-    } catch (error) {
-        
-    }
-})
-
 const UserModel = mongoose.model("User",userSchema);
 
 module.exports = UserModel;
