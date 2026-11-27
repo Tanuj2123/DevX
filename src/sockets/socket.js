@@ -37,6 +37,7 @@ const initializeSocket = (server)=>{
                     socket.emit("messageError",{
                         message:"You must be friends to chat"
                     });
+                    return;
                 }
 
                 let chat = await ChatModel.findOne({participants:{

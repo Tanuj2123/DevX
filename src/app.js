@@ -9,6 +9,7 @@ const chatRouter = require("./routes/chat.routes");
 const cors = require("cors")
 const app = express();
 require("./jobs/sendRequestRemianders");
+require("./queues/worker");
 
 
 /**

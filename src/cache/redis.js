@@ -1,6 +1,7 @@
 const {createClient} = require("redis");
+const {createNodeRedisClient} =  require("bullmq");
 
-const client = createClient({
+const redisClient = createClient({
      username: process.env.REDIS_CLOUD_USERNAME,
     password: process.env.REDIS_CLOUD_PASSWORD,
     socket: {
@@ -9,19 +10,22 @@ const client = createClient({
     }
 });
 
-client.on("error",(error)=>{
+const connection = createNodeRedisClient(redisClient);
+
+redisClient.on("error",(error)=>{
     console.log("Redis Error occured: ",error)
 });
 
-client.on("connect",()=>{
+redisClient.on("connect",()=>{
     console.log("Connected to redis babu Successfully");
 })
 
 
 async function createConnection(){
-    await client.connect();
+    if(!redisClient.isOpen)
+     await redisClient.connect();
 }
 
 createConnection();
 
-module.exports = client;
+module.exports = {redisClient,connection};

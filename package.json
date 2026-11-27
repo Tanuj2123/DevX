@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "bullmq": "^6.7.10",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "date-fns": "^4.4.0",

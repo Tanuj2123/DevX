@@ -3,10 +3,11 @@ const validateSignUpData = require("../validations/signup.validate");
 const UserModel = require("../models/user.model");
 const autenticateUser = require("../middlewares/auth.middleware");
 const sendEmail = require("../services/emailService");
-const redisClient = require("../cache/redis");
+const {redisClient} = require("../cache/redis");
 const generateOtp = require("../utils/generateOtp");
 const validateOTPData = require("../validations/validateOTPData");
-const bcrypt = require("bcryptjs")
+const bcrypt = require("bcryptjs");
+const { sendOTP, sendWelcomeEmail } = require("../queues/queue");
 
 const router = express.Router();
 
@@ -43,9 +44,8 @@ router.post("/signup", async (req,res)=>{
 
         await redisClient.set(email,JSON.stringify(user),{EX:120});
 
-        await sendEmail(email,"DevX:Verify Your email","You Are going to be a part of the the devX family",`<h1>${otp}</h1>`);
+        await sendOTP(email);
 
-        
 
         res.status(200).json({
             success:true,
@@ -112,7 +112,8 @@ router.post("/verifyEmail", async (req,res)=>{
             secure:true,
             sameSite:"lax"
         })
-        await sendEmail(email,"Welcome to DevX","You Are now a part of the the devX family","<h2>Connect to the World With DevX</h2>");
+        //await sendEmail(email,"Welcome to DevX","You Are now a part of the the devX family","<h2>Connect to the World With DevX</h2>");
+        sendWelcomeEmail(email);
 
         return res.status(200).json({
             success:true,
